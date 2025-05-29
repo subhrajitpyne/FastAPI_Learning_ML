@@ -1,0 +1,53 @@
+PS C:\Users\Subhrajit.Pyne\OneDrive - Wolters Kluwer\Desktop\Fast_API_Learning> cd .\todo_app\
+PS C:\Users\Subhrajit.Pyne\OneDrive - Wolters Kluwer\Desktop\Fast_API_Learning\todo_app> sqlite3 todos.db
+SQLite version 3.49.1 2025-02-18 13:38:58
+Enter ".help" for usage hints.
+sqlite> .schema
+CREATE TABLE todos (
+        id INTEGER NOT NULL,
+        title VARCHAR,
+        description VARCHAR,
+        priority INTEGER,
+        complete BOOLEAN,
+        PRIMARY KEY (id)
+);
+CREATE INDEX ix_todos_id ON todos (id);
+sqlite> insert into todos (title,description,priority,complete) values ('Study Python','Study FastAPI',2,True);
+sqlite> select * from todos
+   ...> ;
+1|Study Python|Study FastAPI|2|1
+sqlite> insert into todos (title,description,priority,complete) values ('Complete Upgrad thing','Assignment',3,True);         
+sqlite> select * from todos;                                                                                       
+1|Study Python|Study FastAPI|2|1
+2|Complete Upgrad thing|Assignment|3|1
+sqlite> .mode
+current output mode: list
+sqlite> .mode column
+sqlite> select * from todos;
+id  title                  description    priority  complete
+--  ---------------------  -------------  --------  --------
+1   Study Python           Study FastAPI  2         1
+2   Complete Upgrad thing  Assignment     3         1
+sqlite> .mode markdown
+sqlite> select * from todos;
+| id |         title         |  description  | priority | complete |
+|----|-----------------------|---------------|----------|----------|
+| 1  | Study Python          | Study FastAPI | 2        | 1        |
+| 2  | Complete Upgrad thing | Assignment    | 3        | 1        |
+sqlite> .mode box   
+sqlite> select * from todos;
+┌────┬───────────────────────┬───────────────┬──────────┬──────────┐
+│ id │         title         │  description  │ priority │ complete │
+├────┼───────────────────────┼───────────────┼──────────┼──────────┤
+│ 1  │ Study Python          │ Study FastAPI │ 2        │ 1        │
+│ 2  │ Complete Upgrad thing │ Assignment    │ 3        │ 1        │
+└────┴───────────────────────┴───────────────┴──────────┴──────────┘
+sqlite> .mode table          
+sqlite> select * from todos;
++----+-----------------------+---------------+----------+----------+
+| id |         title         |  description  | priority | complete |
++----+-----------------------+---------------+----------+----------+
+| 1  | Study Python          | Study FastAPI | 2        | 1        |
+| 2  | Complete Upgrad thing | Assignment    | 3        | 1        |
++----+-----------------------+---------------+----------+----------+
+sqlite>
