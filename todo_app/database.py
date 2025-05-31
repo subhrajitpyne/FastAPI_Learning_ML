@@ -2,8 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+#***SQLAlchemy can not update table but we need to create new db if we want to add new tables
+
 #Database URL
-SQLALCHEMY_DB_URL: str = "sqlite:///./todos.db"
+SQLALCHEMY_DB_URL: str = "sqlite:///./todosapp.db"
 
 #Database Engine
 engine: create_engine = create_engine(url=SQLALCHEMY_DB_URL,
