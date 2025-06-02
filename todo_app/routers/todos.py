@@ -37,8 +37,13 @@ async def read_all(user:user_dependancy,db: db_dependancy): # type: ignore
 
 
 @router.get("/id",status_code=status.HTTP_200_OK)
-async def get_todo_by_id(db: db_dependancy,id: int = Query(...,gt=0,description='TodoID')) -> dict:# type: ignore
-    todo: Todos = db.query(Todos).filter(Todos.id == id).first()
+async def get_todo_by_id(user:user_dependancy, # type: ignore
+                         db: db_dependancy, # type: ignore
+                         id: int = Query(...,gt=0,description='TodoID')) -> dict:# type: ignore
+    
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Login failed...')
+    todo: Todos = db.query(Todos).filter(Todos.owner_id == user.id).filter(Todos.id == id).first()
     
     if todo is not None:
         return {
@@ -92,8 +97,15 @@ async def create_todo(user: user_dependancy, # type: ignore
     return {'message': 'Todo created...'}
 
 @router.put("/update_by_id",status_code=status.HTTP_202_ACCEPTED)
-async def update_todo_by_id(db: db_dependancy,todo_request: TodoRequest,id: int=Query(...,gt=0,le=5)) -> dict:# type: ignore
-     todo: Todos = db.query(Todos).filter(Todos.id == id).first()
+async def update_todo_by_id(user:user_dependancy, # type: ignore
+                            db: db_dependancy, # type: ignore
+                            todo_request: TodoRequest,
+                            id: int=Query(...,gt=0,le=5)) -> dict:# type: ignore
+    
+     if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Login failed...')
+    
+     todo: Todos = db.query(Todos).filter(Todos.owner_id == user.get('id')).filter(Todos.id == id).first()
      if todo:
          todo.title = todo_request.title
          todo.description = todo_request.description
@@ -107,8 +119,15 @@ async def update_todo_by_id(db: db_dependancy,todo_request: TodoRequest,id: int=
 
 
 @router.delete('/delete',status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo_by_id(db: db_dependancy,id: int=Query(...,gt=0,le=5)) -> None:# type: ignore
-    todo: Todos = db.query(Todos).filter(Todos.id == id).first()
+async def delete_todo_by_id(user:user_dependancy, # type: ignore
+                            db: db_dependancy, # type: ignore
+                            id: int=Query(...,gt=0,le=5)) -> None:# type: ignore
+    
+    
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Login failed...')
+    
+    todo: Todos = db.query(Todos).filter(Todos.owner_id == user.get('id')).filter(Todos.id == id).first()
 
     if todo:
         db.delete(todo)

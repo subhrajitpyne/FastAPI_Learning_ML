@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter,Depends, HTTPException
 from starlette import status
-from pydantic import BaseModel,EmailStr, Field,field_validator
-import re
+from pydantic import BaseModel
 from typing import *
 from models import Users
 from passlib.context import CryptContext
@@ -75,8 +74,8 @@ class UserResponse(BaseModel):
 
 
 
-def create_access_token(username: str, id: int, expires_delta: timedelta) -> str:
-    to_encode: dict = {'sub': username, 'id': id}
+def create_access_token(username: str,role: str ,id: int, expires_delta: timedelta) -> str:
+    to_encode: dict = {'sub': username, 'id': id,'role': role}
     expire: datetime = datetime.now(timezone.utc) + expires_delta  # ✅ Correct usage else as soon as token will be genaratred, it will be expired
     to_encode.update({'exp': expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -103,13 +102,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> obj
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         print("📥 Decoded JWT payload:", payload)  # 👈 Add this line
 
-        username = payload.get('sub')
-        id = payload.get('id')
+        username:str = payload.get('sub')
+        id:int = payload.get('id')
+        role:str = payload.get('role')
 
         if username is None or id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Login failed')
 
-        return {'username': username, 'id': id}
+        return {'username': username, 'id': id,'role': role}
 
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Login failed')
@@ -118,22 +118,24 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> obj
     
     
     
-@router.post("/create_user",response_model=UserResponse,status_code=status.HTTP_201_CREATED)
-async def create_user(db:db_dependancy,create_user: CreateUserRequest) -> dict: # type: ignore
-    user: Users = Users(
-        username = create_user.username,
-        hashed_password = bcrypt_context.hash(create_user.password),
-        first_name = create_user.first_name,
-        last_name = create_user.last_name,
-        email = create_user.email,
-        role = create_user.role
-    )
+# @router.post("/create_user",response_model=UserResponse,status_code=status.HTTP_201_CREATED)
+# async def create_user(db:db_dependancy,create_user: CreateUserRequest) -> dict: # type: ignore
+#     user: Users = Users(
+#         username = create_user.username,
+#         hashed_password = bcrypt_context.hash(create_user.password),
+#         first_name = create_user.first_name,
+#         last_name = create_user.last_name,
+#         email = create_user.email,
+#         role = create_user.role
+#     )
     
-    if user:
-        db.add(user)
-        db.commit()
-        return user
-    raise HTTPException(status_code=401,detail = "User was not created")
+#     if user:
+#         db.add(user)
+#         db.commit()
+#         return user
+#     raise HTTPException(status_code=401,detail = "User was not created")
+
+#This is in admin.py asd only admin can create a new user...
 
 
 def authenticate_user(username: str,password: str, db: Session) -> object:
@@ -159,8 +161,6 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Login failed')
     
-    token: object = create_access_token (user.username,user.id,timedelta(minutes=20)) #Token will be valid till 20 minutes
+    token: object = create_access_token (user.username,user.role,user.id,timedelta(minutes=20)) #Token will be valid till 20 minutes
     #return {'username': f"{form_data.username} has been autehticated successfully...Token:{token}"}
     return {'access_token': token,'token_type': 'bearer'}
-
-    

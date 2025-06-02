@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from models import *
 from database import engine
 from typing import *
-from routers import auth,todos
+from routers import auth,todos,admin,user
 
 app: FastAPI = FastAPI()
 
@@ -11,5 +11,9 @@ base.metadata.create_all(bind=engine) #This will create sqlite databse and it on
 app.include_router(auth.router) #Routing the API
 
 app.include_router(todos.router)
+
+app.include_router (admin.router)
+
+app.include_router (user.router)
 
 #main.py is only to start the FastAPI and all other things should be routed through routers.
