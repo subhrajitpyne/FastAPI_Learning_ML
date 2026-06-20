@@ -4,15 +4,14 @@ A collection of FastAPI examples covering basic routing, request validation, CRU
 
 ## Projects
 
-- ooks.py demonstrates routes, path and query parameters, and in-memory CRUD operations.
-- ooks_advanced.py adds Pydantic models, validation, status codes, and HTTP exceptions.
-- 	odo_app/ contains a larger Todo application with routers, database models, authentication, templates, and static assets.
+- **books.py** demonstrates routes, path and query parameters, and in-memory CRUD operations.
+- **books_advanced.py** adds Pydantic models, validation, status codes, and HTTP exceptions.
+- **todo_app/** contains a larger Todo application with routers, database models, authentication, templates, and static assets.
 
 ## Requirements
 
 - Python 3.10 or newer
-- Dependencies listed in 
-equiremnts.txt
+- Dependencies listed in **requiremnts.txt**
 
 ## Setup
 
